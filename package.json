@@ -1,0 +1,24 @@
+{
+  "name": "3dlovemouse",
+  "version": "1.0.0",
+  "description": "A funny and strange 3d cube",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Robotechnic/3dLoveMouse.git"
+  },
+  "author": "Robotechnic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Robotechnic/3dLoveMouse/issues"
+  },
+  "homepage": "https://github.com/Robotechnic/3dLoveMouse#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "three": "^0.126.1"
+  }
+}
