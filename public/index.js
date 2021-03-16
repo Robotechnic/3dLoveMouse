@@ -10,7 +10,7 @@ if (!WEBGL.isWebGLAvailable()) {
 }
 //base code to create the scene
 var canvas = document.querySelector("#render")
-const renderer = new THREE.WebGLRenderer({canvas})
+const renderer = new THREE.WebGLRenderer({canvas})//,antialias:true})
 //renderer.setSize( window.innerWidth, window.innerHeight )
 renderer.outputEncoding = THREE.sRGBEncoding
 document.body.appendChild( renderer.domElement ) //add scene to the page
@@ -48,30 +48,42 @@ var yawGoal = 0
 var pitchGoal = 0
 var rotationSpeed = 0.05
 
-//load cubes
-loader.load("/3Dmodels/happyCube.glb",(gltf)=>{
-	gltf.scene.name = "HappyScene"
-	scene.add( gltf.scene )
+//create cube from scratch to add dynamic face
+const geometry = new THREE.BoxGeometry( 10, 10, 10 )
 
-	renderer.render( scene, camera )
-}, undefined, (error)=>{
-	console.error(error)
-})
+//create basic color material
+const colorMaterial = new THREE.MeshBasicMaterial( {color: 0xff00c3} )
 
-loader.load("/3Dmodels/engryCube.glb",(gltf)=>{
-	gltf.scene.name = "EngryScene"
 
-	gltf.visible = false
-	scene.add( gltf.scene )
+//create cube expression with canvas
+const faceCanvas = document.createElement("canvas")
+faceCanvas.width = 10
+faceCanvas.height = 10
 
-}, undefined, (error)=>{
-	console.error(error)
-})
+var context2d = faceCanvas.getContext("2d")
+var happyImage = new Image()
+happyImage.src = "/3Dmodels/textureHappy.png"
+
+var engryImage = new Image()
+engryImage.src = "/3Dmodels/textureEngry.png"
+
+switchHappy()
+
+var canvasTexture = new THREE.CanvasTexture(faceCanvas)
+var canvasMaterial = new THREE.MeshBasicMaterial({canvasTexture})
+
+const cube = new THREE.Mesh( geometry, [canvasMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial] )
+cube.name = "cubeCharacter"
+scene.add( cube )
+
+renderer.render( scene, camera )
 
 //utility
 function switchHappy(happy=true){
-	scene.getObjectByName("HappyScene").visible = happy
-	scene.getObjectByName("EngryScene").visible = !happy
+	if (happy)
+		context2d.drawImage(happyImage,0,0)
+	else
+		context2d.drawImage(engryImage,0,0)
 
 	renderer.render( scene, camera )
 }
