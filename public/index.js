@@ -117,11 +117,12 @@ function cubeLook(x,y) {
 function animate(){
 	requestAnimationFrame(animate) //tell three js to reupdate the cube
 
+	var moove = new THREE.Vector2(yawGoal-scene.rotation.y,pitchGoal-scene.rotation.z)
 
-	scene.rotation.y = scene.rotation.y  + (yawGoal < scene.rotation.y ? -rotationSpeed : rotationSpeed)
-	scene.rotation.y = Math.abs(scene.rotation.y-yawGoal)<rotationSpeed*2 ? yawGoal : scene.rotation.y
-	scene.rotation.z = scene.rotation.z  + (pitchGoal < scene.rotation.z ? -rotationSpeed : rotationSpeed)
-	scene.rotation.z = Math.abs(scene.rotation.z-pitchGoal)<rotationSpeed*2 ? pitchGoal : scene.rotation.z
+
+	scene.rotation.y += moove.x/10
+	scene.rotation.z += moove.y/10
+
 
 	if (scene.rotation.x != yawGoal || scene.rotation.y != pitchGoal){
 		renderer.render( scene, camera )
