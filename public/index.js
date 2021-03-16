@@ -10,8 +10,8 @@ if (!WEBGL.isWebGLAvailable()) {
 }
 //base code to create the scene
 var canvas = document.querySelector("#render")
-const renderer = new THREE.WebGLRenderer({canvas})//,antialias:true})
-//renderer.setSize( window.innerWidth, window.innerHeight )
+const renderer = new THREE.WebGLRenderer({canvas,antialias:true})
+renderer.setSize( window.innerWidth, window.innerHeight )
 renderer.outputEncoding = THREE.sRGBEncoding
 document.body.appendChild( renderer.domElement ) //add scene to the page
 
@@ -49,7 +49,7 @@ var pitchGoal = 0
 var rotationSpeed = 0.05
 
 //create cube from scratch to add dynamic face
-const geometry = new THREE.BoxGeometry( 10, 10, 10 )
+const geometry = new THREE.BoxGeometry( 5, 5, 5 )
 
 //create basic color material
 const colorMaterial = new THREE.MeshBasicMaterial( {color: 0xff00c3} )
@@ -57,20 +57,27 @@ const colorMaterial = new THREE.MeshBasicMaterial( {color: 0xff00c3} )
 
 //create cube expression with canvas
 const faceCanvas = document.createElement("canvas")
-faceCanvas.width = 10
-faceCanvas.height = 10
 
 var context2d = faceCanvas.getContext("2d")
 var happyImage = new Image()
-happyImage.src = "/3Dmodels/textureHappy.png"
+happyImage.src = "/textures/textureHappy.png"
 
 var engryImage = new Image()
-engryImage.src = "/3Dmodels/textureEngry.png"
+engryImage.src = "/textures/textureEngry.png"
 
-switchHappy()
+happyImage.onload = () =>{
+	console.log("loaded")
+	faceCanvas.width = happyImage.width
+	faceCanvas.height = happyImage.height
+	context2d.drawImage(happyImage,0,0)
+	
+	canvasTexture.needsUpdate = true
+	renderer.render( scene, camera )
+}
+
 
 var canvasTexture = new THREE.CanvasTexture(faceCanvas)
-var canvasMaterial = new THREE.MeshBasicMaterial({canvasTexture})
+var canvasMaterial = new THREE.MeshBasicMaterial({map:canvasTexture})
 
 const cube = new THREE.Mesh( geometry, [canvasMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial] )
 cube.name = "cubeCharacter"
@@ -85,6 +92,7 @@ function switchHappy(happy=true){
 	else
 		context2d.drawImage(engryImage,0,0)
 
+	canvasTexture.needsUpdate = true
 	renderer.render( scene, camera )
 }
 
@@ -140,6 +148,8 @@ window.addEventListener("resize", ()=>{
 
 	camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
+
+    renderer.setSize( window.innerWidth, window.innerHeight )
 
 	renderer.render( scene, camera )
 })
