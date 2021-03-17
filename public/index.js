@@ -1,6 +1,7 @@
 import * as THREE from "/build/three.module.js"
 import {GLTFLoader} from "/exemples/loaders/GLTFLoader.js"
 import { WEBGL } from "/exemples/WebGL.js";
+import {Eye} from "/cubeParts/eye.js"
 
 
 
@@ -65,20 +66,29 @@ happyImage.src = "/textures/textureHappy.png"
 var engryImage = new Image()
 engryImage.src = "/textures/textureEngry.png"
 
+var leftEye = new Eye(new THREE.Vector2(33,39),31,68)
+var rightEye = new Eye(new THREE.Vector2(111,40),27,68)
+var lastBlink = Date.now()
+var blinkDelay = 0
+
 happyImage.onload = () =>{
 	console.log("loaded")
 	faceCanvas.width = happyImage.width
 	faceCanvas.height = happyImage.height
 	context2d.drawImage(happyImage,0,0)
-	
+	drawEyes()
+
 	canvasTexture.needsUpdate = true
 	renderer.render( scene, camera )
 }
 
+//store future random look
+var futureLook = 0
 
 var canvasTexture = new THREE.CanvasTexture(faceCanvas)
 var canvasMaterial = new THREE.MeshBasicMaterial({map:canvasTexture})
 
+//create cube
 const cube = new THREE.Mesh( geometry, [canvasMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial,colorMaterial] )
 cube.name = "cubeCharacter"
 scene.add( cube )
@@ -86,14 +96,22 @@ scene.add( cube )
 renderer.render( scene, camera )
 
 //utility
-function switchHappy(happy=true){
-	if (happy)
+function drawFace(){
+	if (mouseInScreen){
 		context2d.drawImage(happyImage,0,0)
-	else
+	}
+	else{
 		context2d.drawImage(engryImage,0,0)
+	}
+	drawEyes()
 
 	canvasTexture.needsUpdate = true
 	renderer.render( scene, camera )
+}
+
+function drawEyes(){
+	leftEye.draw(context2d)
+	rightEye.draw(context2d)
 }
 
 
@@ -107,7 +125,6 @@ function cubeLook(x,y) {
 	yawGoal = -yaw/1.5
 	pitchGoal = pitch/1.5
 
-	
 
 	renderer.render( scene, camera )
 	
@@ -117,6 +134,13 @@ function cubeLook(x,y) {
 function animate(){
 	requestAnimationFrame(animate) //tell three js to reupdate the cube
 
+	//run cube look if necesary
+	if (!mouseInScreen && futureLook<Date.now()){
+		lookAtRandom()
+		futureLook = Date.now()+randInt(1800,3200)
+	}
+
+	//moove cube
 	var moove = new THREE.Vector2(yawGoal-scene.rotation.y,pitchGoal-scene.rotation.z)
 
 
@@ -128,6 +152,21 @@ function animate(){
 		renderer.render( scene, camera )
 	}
 
+
+	//do eyes update
+	if (lastBlink+blinkDelay<Date.now()){
+		leftEye.blink()
+		rightEye.blink()
+		blinkDelay = randInt(2000,5000)
+		lastBlink = Date.now()
+		drawFace()
+	}
+
+	if (leftEye.blinking || rightEye.blinking){
+		leftEye.update()
+		rightEye.update()
+		drawFace()
+	}
 }
 
 
@@ -139,8 +178,6 @@ function randInt(min, max) {
 function lookAtRandom(){
 	if (!mouseInScreen){
 		cubeLook(randInt(0,window.innerWidth),randInt(0,window.innerHeight))
-
-		setTimeout(lookAtRandom,randInt(1000,2000))
 	}
 }
 
@@ -157,17 +194,18 @@ window.addEventListener("resize", ()=>{
 
 window.addEventListener("mouseover",(event)=>{
 	mouseInScreen = true
-	switchHappy()
+	drawFace()
 })
 
 window.addEventListener("mouseout",(event)=>{
-	switchHappy(false)
 	mouseInScreen = false
-	setTimeout(lookAtRandom,randInt(500,1500))
+	drawFace()
+	futureLook = Date.now()+randInt(1000,2000)
 })
 
 window.addEventListener("mousemove",(event)=>{
 	mouseInScreen = true
+	drawFace()
 	cubeLook(event.clientX,event.clientY)
 })
 
