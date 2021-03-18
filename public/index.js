@@ -5,7 +5,7 @@ import {RenderPass} from "/exemples/postprocessing/RenderPass.js"
 import {GlitchPass} from "/exemples/postprocessing/GlitchPass.js"
 
 import {Eye} from "/cubeParts/eye.js"
-
+import {Tear} from "/cubeParts/tear.js"
 
 
 //fist, check if webGL is available
@@ -103,9 +103,14 @@ var futureLook = 0
 //efect variables
 var lastMouseIn = Date.now()
 var lastMouseOut = Date.now()
-var effectDelay = 9000
-var wildDelay = 25000
-var blackScreenDelay = 30000
+var tearsDelay = 2000
+var futureTear = 0
+var tears = []
+var tearsImage = new Image()
+tearsImage.src = "/textures/tear.png"
+var effectDelay = 20000
+var wildDelay = 35000
+var blackScreenDelay = 40000
 var outDelay = 3000
 
 var canvasTexture = new THREE.CanvasTexture(faceCanvas)
@@ -126,6 +131,15 @@ function drawFace(){
 		context2d.drawImage(engryImage,0,0)
 	}
 	drawEyes()
+
+	for (var i = tears.length-1; i>-1; i--){
+		tears[i].draw(context2d,tearsImage)
+		if (tears[i].position.y > faceCanvas.height){
+			console.log('Delete tear')
+			tears.splice(i,1)
+		}
+
+	}
 
 	canvasTexture.needsUpdate = true
 }
@@ -171,14 +185,28 @@ function animate(){
 		rightEye.blink()
 		blinkDelay = randInt(2000,5000)
 		lastBlink = Date.now()
-		drawFace()
 	}
 
 	if (leftEye.blinking || rightEye.blinking){
 		leftEye.update()
 		rightEye.update()
-		drawFace()
 	}
+
+	//tears
+	if (lastMouseIn + tearsDelay < Date.now() && !mouseInScreen){
+		if (futureTear == 0){
+			futureTear = Date.now()+randInt(2000,5000)
+		} else if(futureTear < Date.now()){
+			var eye = Math.round(randInt(0,1))
+			var x = ((eye == 0) ? leftEye.position.x + randInt(0,leftEye.width) : rightEye.position.x + randInt(0,rightEye.width))
+			var y = ((eye == 0) ? leftEye.position.y + leftEye.height : rightEye.position.y + rightEye.height)
+			tears.push(new Tear(new THREE.Vector2(x,y)))
+
+			futureTear = Date.now()+randInt(2000,5000)
+		}
+	}
+
+	drawFace()
 
 	//if mouse go out for too long time, the cube become angry
 	if (lastMouseIn + wildDelay < Date.now() && !mouseInScreen){
@@ -194,6 +222,7 @@ function animate(){
 	}
 
 
+	//last effect draw
 	if (lastMouseIn + blackScreenDelay < Date.now() && !mouseInScreen){
 		canvas.style.opacity = "0%"
 
@@ -220,9 +249,9 @@ function lookAtRandom(){
 window.addEventListener("resize", ()=>{
 
 	camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
+	camera.updateProjectionMatrix()
 
-    renderer.setSize( window.innerWidth, window.innerHeight )
+	renderer.setSize( window.innerWidth, window.innerHeight )
 })
 
 //mouse events
