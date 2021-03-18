@@ -1,6 +1,9 @@
 import * as THREE from "/build/three.module.js"
-import {GLTFLoader} from "/exemples/loaders/GLTFLoader.js"
-import { WEBGL } from "/exemples/WebGL.js";
+import { WEBGL } from "/exemples/WebGL.js"
+import {EffectComposer} from "/exemples/postprocessing/EffectComposer.js"
+import {RenderPass} from "/exemples/postprocessing/RenderPass.js"
+import {GlitchPass} from "/exemples/postprocessing/GlitchPass.js"
+
 import {Eye} from "/cubeParts/eye.js"
 
 
@@ -10,29 +13,42 @@ if (!WEBGL.isWebGLAvailable()) {
 	console.error("WebGL is not supported in this browser.")
 }
 //base code to create the scene
-var canvas = document.querySelector("#render")
-const renderer = new THREE.WebGLRenderer({canvas,antialias:true})
+var canvas = document.getElementById("render")
+var eventHandler = document.getElementById("eventHandler")
+
+const renderer = new THREE.WebGLRenderer({canvas:canvas,antialias:true})
 renderer.setSize( window.innerWidth, window.innerHeight )
 renderer.outputEncoding = THREE.sRGBEncoding
-document.body.appendChild( renderer.domElement ) //add scene to the page
-
 
 //set camera fov, pos and look
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 900 )
 camera.position.set( 20, 0, 0 )
 camera.lookAt( 0, 0, 0 )
 
-
+//create scene object
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( 0x000000 )
 scene.receiveShadow = true
 
+
+//create post processing for angry and sad cube
+const composer = new EffectComposer(renderer)
+const renderPass = new RenderPass( scene, camera );
+composer.addPass( renderPass );
+
+var glitchPass = new GlitchPass();
+glitchPass.enabled = false
+console.log(glitchPass)
+composer.addPass( glitchPass );
+
+
+ //add scene to the page
+eventHandler.appendChild(renderer.domElement)
+
+
 //***********************
 //*** Build the scene ***
 //***********************
-
-//import cubes
-const loader = new GLTFLoader()
 
 //add light
 const light = new THREE.AmbientLight( 0xffffff )// soft white light
@@ -79,11 +95,18 @@ happyImage.onload = () =>{
 	drawEyes()
 
 	canvasTexture.needsUpdate = true
-	renderer.render( scene, camera )
 }
 
 //store future random look
 var futureLook = 0
+
+//efect variables
+var lastMouseIn = Date.now()
+var lastMouseOut = Date.now()
+var effectDelay = 9000
+var wildDelay = 25000
+var blackScreenDelay = 30000
+var outDelay = 3000
 
 var canvasTexture = new THREE.CanvasTexture(faceCanvas)
 var canvasMaterial = new THREE.MeshBasicMaterial({map:canvasTexture})
@@ -93,7 +116,6 @@ const cube = new THREE.Mesh( geometry, [canvasMaterial,colorMaterial,colorMateri
 cube.name = "cubeCharacter"
 scene.add( cube )
 
-renderer.render( scene, camera )
 
 //utility
 function drawFace(){
@@ -106,7 +128,6 @@ function drawFace(){
 	drawEyes()
 
 	canvasTexture.needsUpdate = true
-	renderer.render( scene, camera )
 }
 
 function drawEyes(){
@@ -123,11 +144,7 @@ function cubeLook(x,y) {
 
 
 	yawGoal = -yaw/1.5
-	pitchGoal = pitch/1.5
-
-
-	renderer.render( scene, camera )
-	
+	pitchGoal = pitch/1.5	
 }
 
 
@@ -148,11 +165,6 @@ function animate(){
 	scene.rotation.z += moove.y/10
 
 
-	if (scene.rotation.x != yawGoal || scene.rotation.y != pitchGoal){
-		renderer.render( scene, camera )
-	}
-
-
 	//do eyes update
 	if (lastBlink+blinkDelay<Date.now()){
 		leftEye.blink()
@@ -167,6 +179,29 @@ function animate(){
 		rightEye.update()
 		drawFace()
 	}
+
+	//if mouse go out for too long time, the cube become angry
+	if (lastMouseIn + wildDelay < Date.now() && !mouseInScreen){
+		glitchPass.goWild = true
+	} else if (lastMouseIn + effectDelay < Date.now() && !mouseInScreen){
+		glitchPass.enabled = true
+	} else {
+		glitchPass.goWild = false
+	}
+
+	if (lastMouseOut + outDelay < Date.now() && mouseInScreen){
+		glitchPass.enabled = false
+	}
+
+
+	if (lastMouseIn + blackScreenDelay < Date.now() && !mouseInScreen){
+		canvas.style.opacity = "0%"
+
+	} else {
+		canvas.style.opacity = "100%"
+		composer.render()
+	}
+	
 }
 
 
@@ -188,22 +223,28 @@ window.addEventListener("resize", ()=>{
     camera.updateProjectionMatrix()
 
     renderer.setSize( window.innerWidth, window.innerHeight )
-
-	renderer.render( scene, camera )
 })
 
-window.addEventListener("mouseover",(event)=>{
+//mouse events
+eventHandler.addEventListener("mouseover",(event)=>{
 	mouseInScreen = true
 	drawFace()
 })
 
-window.addEventListener("mouseout",(event)=>{
+eventHandler.addEventListener("mouseout",(event)=>{
 	mouseInScreen = false
 	drawFace()
 	futureLook = Date.now()+randInt(1000,2000)
+	lastMouseIn = Date.now()
 })
 
-window.addEventListener("mousemove",(event)=>{
+eventHandler.addEventListener("mouseenter",(event)=>{
+	mouseInScreen = true
+	drawFace()
+	lastMouseOut = Date.now()
+})
+
+eventHandler.addEventListener("mousemove",(event)=>{
 	mouseInScreen = true
 	drawFace()
 	cubeLook(event.clientX,event.clientY)

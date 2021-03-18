@@ -4,14 +4,21 @@ body {
 	min-height: 100vh;
 	border: none;
 
-	background-image: radial-gradient(gray, black);
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: cover;
-	overflow: hidden;
+	background-color: black;
 }
 
 canvas{
 	min-width: 100%;
 	height: 100vh;
+	transition:opacity 5s;
+}
+
+#eventHandler {
+	height: 100vh;
+	width: 100vw;
+	background-image:url("/textures/tomb.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	overflow: hidden;
 }
