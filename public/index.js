@@ -103,15 +103,15 @@ var futureLook = 0
 //efect variables
 var lastMouseIn = Date.now()
 var lastMouseOut = Date.now()
-var tearsDelay = 2000
+var tearsDelay = 10000
 var futureTear = 0
 var tears = []
 var tearsImage = new Image()
 tearsImage.src = "/textures/tear.png"
-var effectDelay = 20000
-var wildDelay = 35000
-var blackScreenDelay = 40000
-var outDelay = 3000
+var effectDelay = 25000
+var wildDelay = 60000
+var blackScreenDelay = 70000
+var outDelay = 2500
 
 var canvasTexture = new THREE.CanvasTexture(faceCanvas)
 var canvasMaterial = new THREE.MeshBasicMaterial({map:canvasTexture})
