@@ -252,3 +252,7 @@ eventHandler.addEventListener("mousemove",(event)=>{
 
 
 animate()
+
+setTimeout(() => { //prevent tomb to appear before cube load entierly
+	eventHandler.style.backgroundImage = "url('/textures/tomb.svg')"
+},1000)
