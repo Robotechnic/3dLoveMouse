@@ -258,6 +258,7 @@ window.addEventListener("resize", ()=>{
 eventHandler.addEventListener("mouseover",(event)=>{
 	mouseInScreen = true
 	drawFace()
+	cubeLook(event.clientX,event.clientY)
 })
 
 eventHandler.addEventListener("mouseout",(event)=>{
@@ -270,6 +271,7 @@ eventHandler.addEventListener("mouseout",(event)=>{
 eventHandler.addEventListener("mouseenter",(event)=>{
 	mouseInScreen = true
 	drawFace()
+	cubeLook(event.clientX,event.clientY)
 	lastMouseOut = Date.now()
 })
 
