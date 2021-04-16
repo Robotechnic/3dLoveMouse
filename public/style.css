@@ -22,3 +22,62 @@ canvas{
 	background-size: contain;
 	overflow: hidden;
 }
+
+.projectDescriptor {
+	position: absolute;
+	top: 0;
+	left: 0;
+	color:#FFF;
+	background: #222222;
+	padding: 5px;
+	border-bottom-right-radius: 10px;
+}
+
+.projectDescriptor__title {
+	margin:0;
+	margin-bottom: 5px;
+	cursor: pointer;
+}
+
+.projectDescriptor__description{
+	display: none;
+}
+
+.projectDescriptor:hover > .projectDescriptor__description{
+	display: flex;
+	flex-direction: column;
+}
+
+.git-hub-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 10px 5px 5px;
+	border: 2px solid white;
+	border-radius: 40px;
+	letter-spacing: .1em;
+	fill: white;
+	transition: .5s;
+	font-family: Arial;
+	color:white;
+	text-decoration: none;
+	width: max-content;
+	align-self:center;
+}
+
+.git-hub-link * + * {
+	margin-left: 5px;
+}
+
+.git-hub-link:hover {
+	fill: black;
+	color: black;
+	background: white;
+}
+
+
+.git-hub-logo {
+	display: block;
+	position: relative;
+	top: -.5px;
+}
