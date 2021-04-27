@@ -281,6 +281,19 @@ eventHandler.addEventListener("mousemove",(event)=>{
 	cubeLook(event.clientX,event.clientY)
 })
 
+eventHandler.addEventListener("touchmove", (event)=>{
+	mouseInScreen = true
+	drawFace()
+	cubeLook(event.touches[0].clientX,event.touches[0].clientY)
+})
+
+eventHandler.addEventListener("touchend", (event)=>{
+	mouseInScreen = false
+	drawFace()
+	futureLook = Date.now()+randInt(1000,2000)
+	lastMouseIn = Date.now()
+})
+
 
 animate()
 
