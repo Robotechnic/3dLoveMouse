@@ -35,6 +35,30 @@ canvas{
 	border-bottom-right-radius: 10px;
 }
 
+.projectDescriptor__header {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.language-change {
+	position: absolute;
+	display: none;
+	right:5px;
+	top:10px;
+	width:min-content;
+	height:min-content;
+}
+
+.language-change.phone {
+	position: static;
+}
+
+.language-change img {
+	width: 50px;
+}
+
 .projectDescriptor__title {
 	margin:0;
 	margin-bottom: 5px;
@@ -49,6 +73,23 @@ canvas{
 	display: flex;
 	flex-direction: column;
 }
+
+.projectDescriptor:hover  .language-change {
+	display: flex;
+}
+
+@media screen and (min-width: 490px){
+	.language-change {
+		display: flex;
+	}
+
+	.language-change.phone {
+		display: none !important;
+	}
+
+}
+
+
 
 .git-hub-link {
 	display: inline-flex;
@@ -82,14 +123,4 @@ canvas{
 	display: block;
 	position: relative;
 	top: -.5px;
-}
-
-.language-change {
-	position: absolute;
-	top:10px;
-	right:10px;
-}
-
-.language-change img {
-	width: 50px;
 }

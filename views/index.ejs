@@ -25,7 +25,12 @@
 </head>
 <body>
 	<div class="projectDescriptor">
-		<h1 class="projectDescriptor__title">Bobby Love Mouse</h1>
+		<div class="projectDescriptor__header">
+			<h1 class="projectDescriptor__header__title">Bobby Love Mouse</h1>
+			<a class="language-change phone" href="<% if (lang =="en") {%>/fr<% } else { %>/en<% } %>">
+				<img src="/flags/<% if (lang =="fr") {%>english<% } else { %>french<% } %>.png">
+			</a>
+		</div>
 		<div class="projectDescriptor__description">
 			<p>
 				<% if (lang =="fr") {%>
@@ -53,6 +58,7 @@
 	<a class="language-change" href="<% if (lang =="en") {%>/fr<% } else { %>/en<% } %>">
 		<img src="/flags/<% if (lang =="fr") {%>english<% } else { %>french<% } %>.png">
 	</a>
+	
 	<section id="eventHandler">
 		<canvas id="render">
 			
